@@ -352,9 +352,17 @@ DataFrame::row_iterator DataFrame::end() const {
 }
 
 void DataFrame::head(){
-    for (auto &&name : column_names)
-    {
-        std::cout<< name << '\t';
+    
+    // Determine the maximum length of a numeric name for formatting
+    int max_name_len{0};
+    for (const auto& name : column_names) {
+        max_name_len = std::max(max_name_len, static_cast<int>(name.length()));
+    }
+
+    const int spacing{max_name_len + 2};
+    // Print the header row with appropriate spacing
+    for (const auto& name : column_names) {
+        std::cout << std::setw(spacing) << name;
     }
     std::cout << std::endl;
     
@@ -362,10 +370,10 @@ void DataFrame::head(){
     {   
         for (const auto& val : *rowIt) {
             if (std::holds_alternative<double>(val)) {
-                std::cout << std::get<double>(val) << "\t";
+                std::cout << std::setw(spacing)<< std::get<double>(val);
             }
             else if (std::holds_alternative<std::string>(val)) {
-                std::cout << std::get<std::string>(val) << "\t";
+                std::cout << std::setw(spacing)<< std::get<std::string>(val);
             }
         }
         std::cout << std::endl;

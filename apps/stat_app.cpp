@@ -22,6 +22,7 @@ int main()
     
     iris.read_csv("./datasets/iris.csv");
     iris.head();
+    std::cout<< "species " <<iris.get_header()[5] <<"\n";
     std::cout<< "mean " <<iris.mean("SepalWidthCm")<<"\n"; 
 
     std::vector<std::string> att ={"SepalLengthCm","SepalWidthCm"};
