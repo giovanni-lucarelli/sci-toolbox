@@ -11,21 +11,9 @@ TODO.md
 
 # Ignorare le cartelle di build
 /build/
-/bin/
-/dist/
 
 # Ignorare file specifici generati da IDE come Visual Studio Code
 .vscode/
 
 # Ignorare i file di configurazione personali
 config.local.json
-
-# Ignorare tutti i file temporanei
-*.tmp
-*.swp
-
-# Ignorare tutti i file nella cartella `temp` e le sue sottocartelle
-temp/**
-
-# Eccezione: includi `important.log` anche se i file `.log` sono ignorati
-!important.log
