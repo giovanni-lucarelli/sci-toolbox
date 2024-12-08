@@ -11,6 +11,7 @@ TODO.md
 
 # Ignorare le cartelle di build
 /build/
+/bin/
 
 # Ignorare file specifici generati da IDE come Visual Studio Code
 .vscode/

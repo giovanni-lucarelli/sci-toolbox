@@ -60,6 +60,8 @@ public:
     double min(const std::string& name);
     
     double max(const std::string& name);
+
+    double quantile(const std::string& name, const double& q);
     
     double var(const std::string& name);
 

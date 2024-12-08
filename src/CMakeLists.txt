@@ -14,4 +14,4 @@ target_compile_options(dataframe PRIVATE
 target_link_libraries(dataframe PUBLIC GSL::gsl GSL::gslcblas)
 
 # Specifica il percorso degli header per la libreria
-target_include_directories(dataframe PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(dataframe PUBLIC ${CMAKE_SOURCE_DIR}/include)

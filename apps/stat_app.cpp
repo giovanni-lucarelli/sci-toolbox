@@ -30,5 +30,12 @@ int main()
     iris.correlation_matrix(att);
 
     iris.table("Species");
+
+    std::cout <<"Quantile-25:" <<iris.quantile("SepalWidthCm", 0.25)<<"\n";
+    std::cout <<"Quantile-50:" <<iris.quantile("SepalWidthCm", 0.50)<<"\n";
+    std::cout <<"Quantile-75:" <<iris.quantile("SepalWidthCm", 0.75)<<"\n";
+    std::cout <<"Quantile-100:" <<iris.quantile("SepalWidthCm", 1.0)<<"\n";
+
+
     return 0;
 }

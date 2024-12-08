@@ -137,6 +137,20 @@ double DataFrame::max(const std::string& name) {
     return gsl_stats_max(values.data(), 1, values.size());
 }
 
+double DataFrame::quantile(const std::string& name, const double& q) {
+    // If values does not contain any numerical value, raise an error
+    // Convert the column into a std::vector of doubles
+    std::vector<double> values= get_double_column(name);
+    // If values does not contain any numerical value, raise an error
+    if (values.empty()) {
+        throw std::runtime_error("Error in function mean(): vector is empty.");
+    }
+    std::sort(values.begin(), values.end());
+
+    return gsl_stats_quantile_from_sorted_data(values.data(), 1, values.size(), q);
+    //return gsl_stats_max(values.data(), 1, values.size());
+}
+
 double DataFrame::var(const std::string& name) {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles

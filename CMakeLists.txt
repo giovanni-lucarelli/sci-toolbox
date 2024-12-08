@@ -13,8 +13,8 @@ find_package(GSL REQUIRED)
 # Aggiungi la directory src per includere i file della libreria
 add_subdirectory(src)
 
-# Specifica il percorso degli header per la libreria
-include_directories(${CMAKE_SOURCE_DIR}/src)
+# Specifica il percorso degli header nella cartella include
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Crea l'eseguibile stat_app nella cartella apps
 add_executable(stat_app
