@@ -4,11 +4,12 @@
 
 int main(int argc, char* argv[])
 {   
-
     try
     {
-        // Check if the user inserted all the required inputs
-        if(argc<3){ throw std::runtime_error("Not enough arguments provided from terminal. Retry!");}
+        if(argc<3)
+        { 
+            throw std::runtime_error("Not enough arguments provided.");
+        }
 
         std::string in_dir_name="../datasets/";
         std::string in_file_name=argv[1];
@@ -24,10 +25,10 @@ int main(int argc, char* argv[])
         // Check if the output file is opened correctly
         if (!file.is_open()) {
             std::cerr << "Error in opening output file." << std::endl;
-            return 1; // Return an error code
+            return 1; 
         }
 
-        // From now we redirect the standard output to the output file
+        // redirect the std output to the output file
         std::streambuf *original_buffer = std::cout.rdbuf();
         std::cout.rdbuf(file.rdbuf());
 
@@ -39,7 +40,6 @@ int main(int argc, char* argv[])
 
         // Restore the original standard output
         std::cout.rdbuf(original_buffer);
-        // The file will be automatically closed when outputFile goes out of scope
         std::cout<<out_file_name<<" saved successfully in "<<out_dir_name<<std::endl;
     }
     catch(const std::exception& e)

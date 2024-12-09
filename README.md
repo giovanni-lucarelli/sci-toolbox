@@ -30,6 +30,8 @@ This is the project for the second homework assignment of the course Advanced Pr
 │
 ├── 📂 include/	
 │   └── 📄 dataframe.hpp
+│ 
+├── 📂 output/
 │
 ├── 📂 src/
 │   ├── 📝 CMakeLists.txt
