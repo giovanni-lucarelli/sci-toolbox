@@ -11,7 +11,7 @@ target_compile_options(dataframe PRIVATE
 )
 
 # Linka GSL alla libreria condivisa dataframe
-target_link_libraries(dataframe PUBLIC GSL::gsl GSL::gslcblas)
+target_link_libraries(dataframe PUBLIC Boost::json Boost::system GSL::gsl GSL::gslcblas)
 
 # Specifica il percorso degli header per la libreria
-target_include_directories(dataframe PUBLIC ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(dataframe PUBLIC ${Boost_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/include)

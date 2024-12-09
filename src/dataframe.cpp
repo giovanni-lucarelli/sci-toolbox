@@ -9,8 +9,10 @@
 #include <fstream>
 #include <numeric>
 #include <variant>
-#include <optional>
+#include <optional>         
 #include <gsl/gsl_statistics.h>
+#include <boost/histogram.hpp>
+#include <boost/json.hpp>
 #include <map> 
 #include "dataframe.hpp"
 
@@ -269,6 +271,44 @@ void DataFrame::table(const std::string& name){
 
 }
 
+// Metodo per generare un istogramma da una colonna specifica
+void DataFrame::histogram(const std::string& name, int num_bins) const
+{
+    std::vector<double> values{get_double_column(name)};
+    
+    if (values.empty())
+    {
+        std::cerr << "Empty column: " << name << std::endl;
+        return;
+    }
+
+    // Determine the minimum and maximum values
+    double min_value = *std::min_element(values.begin(), values.end());
+    double max_value = *std::max_element(values.begin(), values.end());
+
+    // Add a small epsilon to the maximum value to ensure it falls in the last bin
+    double epsilon = std::numeric_limits<double>::epsilon();
+    double max_value_adjusted = max_value + 10*epsilon;
+
+    // Build a histogram with an inclusive upper bound
+    auto hist = boost::histogram::make_histogram(
+        boost::histogram::axis::regular<>(num_bins, min_value, max_value_adjusted)
+    );
+
+    // Fill the histogram
+    for (double value : values)
+    {
+        hist(value);
+    }
+
+    // Print the histogram
+    for (auto&& bin : boost::histogram::indexed(hist))
+    {
+        std::cout << "[" << bin.index() << "] " << bin.bin(0).lower() << " - " << bin.bin(0).upper()
+                  << ": " << *bin << std::endl;
+    }
+}
+
 
 DataFrame::row_iterator::row_iterator(const DataFrame& df, size_t row) 
     : dataframe(df), current_row(row) {
@@ -421,6 +461,8 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
             // Trim whitespace
             cell.erase(0, cell.find_first_not_of(" \t\r\n"));
             cell.erase(cell.find_last_not_of(" \t\r\n") + 1);
+
+            // TODO aggiungere degli if per castare come double/nullptr o string!
             row_cells.push_back(cell);
         }
 
@@ -462,6 +504,141 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
                     // If row is shorter, push null
                     data[col].push_back(std::nullopt);
                 }
+            }
+        }
+    }
+}
+
+/* void DataFrame::read_json(const std::string& filename)
+{
+    try
+    {
+        // Apri il file
+        std::ifstream file(filename);
+        if (!file.is_open())
+        {
+            std::cerr << "Errore nell'apertura del file: " << filename << std::endl;
+            throw std::invalid_argument("file not found");
+        }
+
+        // Leggi il contenuto del file in una stringa
+        std::string json_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+        // Parsing del JSON
+        boost::json::value json_value = boost::json::parse(json_content);
+
+        // Estrai i nomi delle colonne
+        const auto& json_object = json_value.as_object();
+        column_names.clear();
+        for (const auto& col_name : json_object.at("columns").as_array())
+        {
+            column_names.push_back(col_name.as_string().c_str());
+        }
+
+        // Inizializza le colonne vuote
+        data.clear();
+        data.resize(column_names.size());
+
+        // Estrai i dati riga per riga
+        const auto& rows = json_object.at("data").as_array();
+        for (const auto& row : rows)
+        {
+            const auto& row_array = row.as_array();
+            for (size_t i = 0; i < row_array.size(); ++i)
+            {
+                const auto& cell = row_array[i];
+                if (cell.is_null())
+                {
+                    data[i].push_back(std::nullopt);
+                }
+                else if (cell.is_double() || cell.is_int64())
+                {
+                    data[i].push_back(cell.to_number<double>());
+                }
+                else if (cell.is_string())
+                {
+                    data[i].push_back(cell.as_string().c_str());
+                }
+                else
+                {
+                    std::cerr << "Tipo di dato non supportato nella cella" << std::endl;
+                }
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Errore durante la lettura del JSON: " << e.what() << std::endl;
+    }
+} */
+
+void DataFrame::read_json(const std::string& filename) {
+    // Clear existing data
+    column_names.clear();
+    data.clear();
+
+    // Read file contents
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open file: " + filename);
+    }
+
+    // Parse entire file contents
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string jsonStr = buffer.str();
+
+    // Parse JSON 
+    boost::json::value parsedJson = boost::json::parse(jsonStr);
+
+    // Ensure it's an array
+    if (!parsedJson.is_array()) {
+        throw std::runtime_error("JSON must be an array of objects");
+    }
+
+    const boost::json::array& jsonArray = parsedJson.as_array();
+    
+    if (jsonArray.empty()) {
+        throw::std::runtime_error("No data to load");
+    }
+
+    // Extract column names from first object
+    const boost::json::object& firstObj = jsonArray[0].as_object();
+    for (const auto& [key, value] : firstObj) {
+        column_names.push_back(std::string(key));
+    }
+
+    // Prepare columns
+    data.resize(column_names.size());
+
+    // Populate data
+    for (const auto& jsonRow : jsonArray) {
+        const boost::json::object& rowObj = jsonRow.as_object();
+        
+        // Iterate through expected columns
+        for (size_t colIndex = 0; colIndex < column_names.size(); ++colIndex) {
+            const std::string& colName = column_names[colIndex];
+            
+            // Find the value for this column
+            auto it = rowObj.find(colName);
+            if (it == rowObj.end()) {
+                // Column not found, add null
+                data[colIndex].push_back(std::optional<DataType>{std::nullopt});
+                continue;
+            }
+
+            // Convert value based on type
+            const boost::json::value& value = it->value();
+            
+            if (value.is_double()) {
+                data[colIndex].push_back(value.as_double());
+            }
+            else if (value.is_string()) {
+                data[colIndex].push_back(std::string(value.as_string()));
+            }
+            else {
+                // Unsupported type, add null
+                data[colIndex].push_back(std::optional<DataType>{std::nullopt});
             }
         }
     }

@@ -27,6 +27,8 @@ public:
 
     void read_csv(const std::string& filename, char separator = ',', bool has_header = true);
 
+    void read_json(const std::string& filename);
+
     const std::vector<ColumnType>& get_data();
 
     std::pair<unsigned int,unsigned int> shape() const;
@@ -76,6 +78,8 @@ public:
     void table(const std::string& name);
 
     void head();
+
+    void histogram(const std::string& name, int num_bins = 10) const;
 
 
     // ##############################
