@@ -1,8 +1,54 @@
 #include "dataframe.hpp"
 #include <iostream>
+#include <fstream>
 
-int main()
-{
+int main(int argc, char* argv[])
+{   
+
+    try
+    {
+        // Check if the user inserted all the required inputs
+        if(argc<3){ throw std::runtime_error("Not enough arguments provided from terminal. Retry!");}
+
+        std::string in_dir_name="../datasets/";
+        std::string in_file_name=argv[1];
+
+        std::string out_dir_name="../output/";
+        std::string out_file_name=argv[2];
+
+        DataFrame iris{};
+        iris.read_json(in_dir_name+in_file_name);
+
+        // Open a file for writing
+        std::ofstream file(out_dir_name+out_file_name);
+        // Check if the output file is opened correctly
+        if (!file.is_open()) {
+            std::cerr << "Error in opening output file." << std::endl;
+            return 1; // Return an error code
+        }
+
+        // From now we redirect the standard output to the output file
+        std::streambuf *original_buffer = std::cout.rdbuf();
+        std::cout.rdbuf(file.rdbuf());
+
+        iris.table_nan();
+        iris.head();
+        iris.drop_row_nan();
+        iris.head();
+        iris.table_nan();
+
+        // Restore the original standard output
+        std::cout.rdbuf(original_buffer);
+        // The file will be automatically closed when outputFile goes out of scope
+        std::cout<<out_file_name<<" saved successfully in "<<out_dir_name<<std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+
     /* DataFrame df{};
 
     std::vector<std::string> head{"Col0", "Col1"};
@@ -29,14 +75,14 @@ int main()
     df.table("Col0"); */
     
     // JSON VERSION
-    DataFrame iris{};
+    /* DataFrame iris{};
     iris.read_json("./datasets/iris.json");
 
     iris.table_nan();
     iris.head();
     iris.drop_row_nan();
     iris.head();
-    iris.table_nan();
+    iris.table_nan(); */
   
     /* // CSV VERSION
 

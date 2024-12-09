@@ -31,6 +31,3 @@ add_executable(stat_app
 
 # Linka la libreria condivisa dataframe all'eseguibile stat_app
 target_link_libraries(stat_app PRIVATE dataframe Boost::json Boost::system GSL::gsl GSL::gslcblas)
-
-# Copia datasets e output directories nella build directory
-file(COPY ${CMAKE_SOURCE_DIR}/datasets DESTINATION ${CMAKE_BINARY_DIR})
