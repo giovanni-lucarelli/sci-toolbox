@@ -14,8 +14,8 @@ class DataFrame
 {   
     
 private:
-    std::vector<std::string> column_names{};
-    std::vector<ColumnType> data{};
+    std::vector<std::string> column_names;
+    std::vector<ColumnType> data;
 public:
     DataFrame() = default; // consente di creare DataFrame df{}, senza inizializzazione
     ~DataFrame() = default;
@@ -41,9 +41,17 @@ public:
 
     void set_header(const std::vector<std::string>& new_header);
 
+    void drop_row(const unsigned int& row);
+
+    void drop_col(const std::string& name);
+
     unsigned int find_idx(const std::string& name) const;
 
     bool is_numeric(const std::string& name);
+
+    void table_nan();
+
+    void drop_row_nan();
 
     // Metodo per ottenere una colonna filtrata solo con double 
     // serve per usare tutte le routine gls
@@ -81,7 +89,6 @@ public:
 
     void histogram(const std::string& name, int num_bins = 10) const;
 
-
     // ##############################
     // #     row iterator class     #
     // ##############################
@@ -95,7 +102,8 @@ public:
     public:
         // Tipi richiesti per gli iterator traits
         using iterator_category = std::forward_iterator_tag;
-        using value_type = std::vector<std::variant<double, std::string>>;
+        /* using value_type = std::vector<std::variant<double, std::string>>; */
+        using value_type = ColumnType;
         using difference_type = std::ptrdiff_t;
         using pointer = value_type*;
         using reference = value_type&;

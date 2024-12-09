@@ -53,6 +53,27 @@ void DataFrame::set_header(const std::vector<std::string>& new_header){
     column_names = new_header;
 }
 
+void DataFrame::drop_row(const unsigned int& row)
+{
+    for (auto &&col : data)
+    {
+        col.erase((col.begin()+row));
+    }
+    
+}
+
+void DataFrame::drop_col(const std::string& name)
+{   
+    // Find the index once and store it
+    unsigned int idx = find_idx(name);
+    
+    // Erase the column name
+    column_names.erase(column_names.begin() + idx);
+    
+    // Erase the corresponding column data
+    data.erase(data.begin() + idx);
+}
+
 unsigned int DataFrame::find_idx(const std::string& name) const {
     // Find the attribute
     auto it = std::find(column_names.begin(), column_names.end(), name);
@@ -69,12 +90,13 @@ unsigned int DataFrame::find_idx(const std::string& name) const {
 // serve per usare tutte le routine gls
 std::vector<double> DataFrame::get_double_column(const std::string& name) const{
     std::vector<double> double_values{};
+    
     for (const auto &cell : data[find_idx(name)])
     {
         if (cell && std::holds_alternative<double>(*cell))
         {
             double_values.push_back(std::get<double>(*cell));
-        }
+        }   
     }
     return double_values;
 }
@@ -89,6 +111,49 @@ std::vector<std::string> DataFrame::get_string_column(const std::string& name) c
         }
     }
     return string_values;
+}
+
+void DataFrame::table_nan()
+{
+    for (auto &&name : column_names)
+    {
+        unsigned int cnt{0};
+        for (auto &&value : data[find_idx(name)])
+        {
+            if (!value.has_value())
+            {
+                cnt++;
+            }   
+        }
+        std::cout << name << "\t" << cnt << "\n";
+    }
+}
+
+void DataFrame::drop_row_nan()
+{
+    if (data.empty()) {
+        return;
+    }
+
+    // Number of rows (assuming all columns have the same number of rows)
+    std::size_t num_rows = data[0].size();
+
+    // Vector to mark rows that should be removed
+    std::vector<unsigned int> rows_to_drop;
+
+    // Identify rows with any `std::nullopt`
+    for (const auto& column : data) {
+        for (std::size_t i = 0; i < num_rows; ++i) {
+            if (!column[i].has_value()) {
+                rows_to_drop.push_back(i);
+            }
+        }
+    }
+
+    for (auto &&idx : rows_to_drop)
+    {
+        drop_row(idx);
+    }
 }
 
 double DataFrame::mean(const std::string& name) {
@@ -322,26 +387,8 @@ DataFrame::row_iterator::row_iterator(const DataFrame& df, size_t row)
 DataFrame::row_iterator::value_type DataFrame::row_iterator::operator*() const {
     value_type row;
     for (const auto& column : dataframe.data) {
-        // Check if the index is valid for this column
         if (current_row < column.size()) {
-            const auto& optional_value = column[current_row];
-            
-            // Check if the optional value exists
-            if (optional_value.has_value()) {
-                const auto& value = optional_value.value();
-                
-                // Add the value to the row, preserving its original type
-                if (std::holds_alternative<double>(value)) {
-                    row.push_back(std::get<double>(value));
-                }
-                else if (std::holds_alternative<std::string>(value)) {
-                    row.push_back(std::get<std::string>(value));
-                }
-            }
-            else {
-                // Optional: handle null values (you might want to push a specific variant or skip)
-                row.push_back(std::numeric_limits<double>::quiet_NaN()); // or some other default
-            }
+            row.push_back(column[current_row]);
         }
     }
     return row;
@@ -408,13 +455,23 @@ void DataFrame::head(){
     
     for (auto rowIt = this->begin(); rowIt < std::min(this->begin()+5, this->end()); rowIt++)  
     {   
-        for (const auto& val : *rowIt) {
-            if (std::holds_alternative<double>(val)) {
-                std::cout << std::setw(spacing)<< std::get<double>(val);
+        for (const auto& el : *rowIt) {
+
+            if(el.has_value())
+            {   
+                const auto& value = el.value();
+                if (std::holds_alternative<double>(value)) {
+                    std::cout << std::setw(spacing)<< std::get<double>(value);
+                }
+                else if (std::holds_alternative<std::string>(value)) {
+                    std::cout << std::setw(spacing)<< std::get<std::string>(value);
+                }
+            } 
+            else 
+            {
+                std::cout << std::setw(spacing)<< "nan";
             }
-            else if (std::holds_alternative<std::string>(val)) {
-                std::cout << std::setw(spacing)<< std::get<std::string>(val);
-            }
+                
         }
         std::cout << std::endl;
     } 
@@ -450,22 +507,43 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
 
     // Read all rows and store in raw_data
 
-    std::vector<std::vector<std::string>> raw_data;
+    std::vector<ColumnType> raw_data;
     while (std::getline(file, line)) {
         std::istringstream row_stream(line);
         std::string cell;
-        std::vector<std::string> row_cells;
+        ColumnType row_cells;
+        /* std::vector<std::string> row_cells; */
 
         // Parse each cell in the row
-        while (std::getline(row_stream, cell, separator)) {
+        /* while (std::getline(row_stream, cell, separator)) {
             // Trim whitespace
             cell.erase(0, cell.find_first_not_of(" \t\r\n"));
             cell.erase(cell.find_last_not_of(" \t\r\n") + 1);
 
             // TODO aggiungere degli if per castare come double/nullptr o string!
             row_cells.push_back(cell);
-        }
+        } */
 
+        while (std::getline(row_stream, cell, separator)) {
+            // Trim whitespace
+            /* cell.erase(0, cell.find_first_not_of(" \t\r\n"));
+            cell.erase(cell.find_last_not_of(" \t\r\n") + 1); */
+
+            // Se la cella è vuota, inserisci std::nullopt
+            if (cell.empty()) {
+                row_cells.push_back(std::nullopt);
+            } 
+            else 
+            {
+                // Prova a convertire la cella in double
+                try {
+                    row_cells.push_back(std::stod(cell));
+                } catch (const std::invalid_argument&) {
+                    // Se la conversione fallisce, trattala come stringa
+                    row_cells.push_back(cell);
+                }
+            }
+        }
         // Add row to raw data
         raw_data.push_back(row_cells);
     }
@@ -488,18 +566,16 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
         // Populate columns
         for (const auto& row : raw_data) {
             for (size_t col = 0; col < column_names.size(); ++col) {
-                if (col < row.size()) {
-                    // Try to convert to double, otherwise store as string
-                    try {
+                if (col < row.size()) {                    
+                    /* try {
                         if (row[col].empty()) {
                             data[col].push_back(std::nullopt);
                         } else {
                             double numeric_value = std::stod(row[col]);
                             data[col].push_back(numeric_value);
                         }
-                    } catch (const std::invalid_argument&) {
-                        data[col].push_back(row[col]);
-                    }
+                    } catch (const std::invalid_argument&) { */
+                    data[col].push_back(row[col]);
                 } else {
                     // If row is shorter, push null
                     data[col].push_back(std::nullopt);
@@ -634,7 +710,13 @@ void DataFrame::read_json(const std::string& filename) {
                 data[colIndex].push_back(value.as_double());
             }
             else if (value.is_string()) {
-                data[colIndex].push_back(std::string(value.as_string()));
+                std::string strValue = std::string(value.as_string());
+                if (strValue.empty()) {
+                    // Treat empty strings as null
+                    data[colIndex].push_back(std::optional<DataType>{std::nullopt});
+                } else {
+                    data[colIndex].push_back(strValue);
+                }
             }
             else {
                 // Unsupported type, add null
