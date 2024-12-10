@@ -17,13 +17,12 @@ private:
     std::vector<std::string> column_names;
     std::vector<ColumnType> data;
 public:
-    DataFrame() = default; // consente di creare DataFrame df{}, senza inizializzazione
+    DataFrame() = default; 
     ~DataFrame() = default;
 
-
-    // ############################################
-    //      methods to manage the data frame     
-    // ############################################
+    /* ---------------------------------------------------------------------- */
+    /*                         DATA STRUCTURE METHODS                         */
+    /* ---------------------------------------------------------------------- */
 
     void read_csv(const std::string& filename, char separator = ',', bool has_header = true);
 
@@ -47,7 +46,7 @@ public:
 
     unsigned int find_idx(const std::string& name) const;
 
-    bool is_numeric(const std::string& name);
+    bool is_numeric(const std::string& name) const;
 
     void table_nan();
 
@@ -59,39 +58,43 @@ public:
 
     std::vector<std::string> get_string_column(const std::string& name) const;
 
-    // ################################
-    // #     stastistical methods     #
-    // ################################
+    unsigned int formatting_width() const;
 
-    double mean(const std::string& name);
+    /* ---------------------------------------------------------------------- */
+    /*                               STATISTICS                               */
+    /* ---------------------------------------------------------------------- */
 
-    double median(const std::string& name);
+    double mean(const std::string& name) const;
+
+    double median(const std::string& name) const;
     
-    double min(const std::string& name);
+    double min(const std::string& name) const;
     
-    double max(const std::string& name);
+    double max(const std::string& name) const;
 
-    double quantile(const std::string& name, const double& q);
+    double quantile(const std::string& name, const double& q) const;
     
-    double var(const std::string& name);
+    double var(const std::string& name) const;
 
-    double sd(const std::string& name);
+    double sd(const std::string& name) const;
     
-    double covariance(const std::string& name1, const std::string& name2);
+    double covariance(const std::string& name1, const std::string& name2) const;
 
-    double correlation(const std::string& name1, const std::string& name2);
+    double correlation(const std::string& name1, const std::string& name2) const;
 
-    void correlation_matrix(std::vector<std::string>& names);
+    void correlation_matrix(std::vector<std::string>& names) const;
 
-    void table(const std::string& name);
+    void table(const std::string& name) const;
 
-    void head();
+    void head() const;
 
     void histogram(const std::string& name, int num_bins = 10) const;
 
-    // ##############################
-    // #     row iterator class     #
-    // ##############################
+    void summary() const;
+
+    /* ---------------------------------------------------------------------- */
+    /*                           ROW ITERATOR CLASS                           */
+    /* ---------------------------------------------------------------------- */
 
     class row_iterator {
     private:
@@ -102,7 +105,6 @@ public:
     public:
         // Tipi richiesti per gli iterator traits
         using iterator_category = std::forward_iterator_tag;
-        /* using value_type = std::vector<std::variant<double, std::string>>; */
         using value_type = ColumnType;
         using difference_type = std::ptrdiff_t;
         using pointer = value_type*;
@@ -128,7 +130,6 @@ public:
         bool operator==(const row_iterator& other) const;
     };
 
-    // Metodi nella classe DataFrame per supportare l'iterazione per righe
     row_iterator begin() const;
 
     row_iterator end() const;

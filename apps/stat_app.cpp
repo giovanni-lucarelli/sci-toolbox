@@ -17,9 +17,6 @@ int main(int argc, char* argv[])
         std::string out_dir_name="../output/";
         std::string out_file_name=argv[2];
 
-        DataFrame iris{};
-        iris.read_json(in_dir_name+in_file_name);
-
         // Open a file for writing
         std::ofstream file(out_dir_name+out_file_name);
         // Check if the output file is opened correctly
@@ -28,15 +25,75 @@ int main(int argc, char* argv[])
             return 1; 
         }
 
-        // redirect the std output to the output file
+        // redirect the output to the output file
         std::streambuf *original_buffer = std::cout.rdbuf();
         std::cout.rdbuf(file.rdbuf());
 
-        iris.table_nan();
+        /* ------------------------------------------------------------------ */
+        /*               Dataframe Methods Testing: Iris Dataset              */
+        /* ------------------------------------------------------------------ */
+        DataFrame iris{};
+        iris.read_csv(in_dir_name+in_file_name);
+
+        
         iris.head();
+    
+        iris.summary();
+
+        // print variance and standard deviation for each numerical feature
+        for (auto &&name : iris.get_header())
+        {
+            if (iris.is_numeric(name))
+            {
+                std::cout << name << "\tVariance: " << iris.var(name) << "\tSd: " << iris.sd(name) << std::endl;
+            }    
+        }
+        
+        // print the frequency count table
+
+        iris.table("Species");
+        
+        // look for nans
+        iris.table_nan();
+        
+        // drop rows containing nans in order to compute covariance etc
         iris.drop_row_nan();
+
+        // look at the head to check that the rows have been removed
         iris.head();
         iris.table_nan();
+        iris.drop_row(1);
+        iris.head();
+        iris.table_nan();
+
+/*         // compute covariance and correlation between two numerical features
+        std::cout << "covariance(SepalLengthCm,SepalWidthCm)" << iris.correlation("SepalWidthCm", "PetalWidthCm")<<"\n\n";
+        std::cout << "correlation(SepalLengthCm,SepalWidthCm)" << iris.correlation("SepalWidthCm", "PetalWidthCm")<<"\n\n";
+        
+        // print the correlation matrix between all the pairs of (numerical) features
+        std::vector<std::string> att ={"SepalLengthCm",
+                                        "SepalWidthCm",
+                                        "PetalLengthCm",
+                                        "PetalWidthCm"};
+        std::cout << "CORRELATION MATRIX" << std::endl;
+        iris.correlation_matrix(att); */
+
+        // print the histogram of a (numerical) feature
+        // remark: the histogram for a categorical il just the frequency table
+
+        std::cout<<"HISTOGRAM (10 bins):   Sepal Width (Cm)"<<"\n";
+        iris.histogram("SepalWidthCm");
+
+        std::cout<<"HISTOGRAM (5 bins):   Sepal Width (Cm)"<<"\n";
+        iris.histogram("SepalWidthCm", 5);
+
+
+        // testing the drop col method
+        iris.drop_col("SepalWidthCm");
+        std::cout<<"The following table should not have the column SepalWidthCm"<<std::endl;
+        iris.head();   
+
+        /* ------------------------------------------------------------------ */
 
         // Restore the original standard output
         std::cout.rdbuf(original_buffer);

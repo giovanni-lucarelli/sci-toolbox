@@ -1,0 +1,87 @@
+----------------------------------------- Dataset Head -----------------------------------------
+Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    Species         
+1               5.1             nan             1.4             0.2             Iris-setosa     
+2               4.9             3               1.4             0.2             Iris-setosa     
+3               4.7             3.2             1.3             nan             Iris-setosa     
+4               4.6             3.1             1.5             0.2             Iris-setosa     
+5               5               3.6             1.4             0.2             Iris-setosa     
+------------------------------------------------------------------------------------------------
+------------------------------------ Dataset Summary ------------------------------------
+          Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    
+Min.      1               4.3             2               1               0.1             
+1st Qu.   38.25           5.1             2.8             1.6             0.3             
+Median    75.5            5.8             3               4.35            1.3             
+Mean      75.5            5.84333         3.05203         3.75867         1.20537         
+3rd Qu.   112.75          6.4             3.3             5.1             1.8             
+Max.      150             7.9             4.4             6.9             2.5             
+------------------------------------------------------------------------------------------
+Id	Variance: 1887.5	Sd: 43.4454
+SepalLengthCm	Variance: 0.685694	Sd: 0.828066
+SepalWidthCm	Variance: 0.189043	Sd: 0.434791
+PetalLengthCm	Variance: 3.11318	Sd: 1.76442
+PetalWidthCm	Variance: 0.579566	Sd: 0.761292
+Iris-setosa      Iris-versicolor  Iris-virginica   
+50               50               50               
+Id              0               
+SepalLengthCm   0               
+SepalWidthCm    2               
+PetalLengthCm   0               
+PetalWidthCm    1               
+Species         0               
+droppare0
+droppare7
+droppare1
+----------------------------------------- Dataset Head -----------------------------------------
+Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    Species         
+2               4.9             3               1.4             0.2             Iris-setosa     
+4               4.6             3.1             1.5             0.2             Iris-setosa     
+5               5               3.6             1.4             0.2             Iris-setosa     
+6               5.4             3.9             1.7             0.4             Iris-setosa     
+7               4.6             3.4             1.4             0.3             Iris-setosa     
+------------------------------------------------------------------------------------------------
+Id              0               
+SepalLengthCm   0               
+SepalWidthCm    0               
+PetalLengthCm   0               
+PetalWidthCm    0               
+Species         0               
+----------------------------------------- Dataset Head -----------------------------------------
+Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    Species         
+2               4.9             3               1.4             0.2             Iris-setosa     
+5               5               3.6             1.4             0.2             Iris-setosa     
+6               5.4             3.9             1.7             0.4             Iris-setosa     
+7               4.6             3.4             1.4             0.3             Iris-setosa     
+8               5               3.4             1.5             0.2             Iris-setosa     
+------------------------------------------------------------------------------------------------
+Id              0               
+SepalLengthCm   0               
+SepalWidthCm    0               
+PetalLengthCm   0               
+PetalWidthCm    0               
+Species         0               
+HISTOGRAM (10 bins):   Sepal Width (Cm)
+[0] 2 - 2.24: 4
+[1] 2.24 - 2.48: 7
+[2] 2.48 - 2.72: 22
+[3] 2.72 - 2.96: 23
+[4] 2.96 - 3.2: 49
+[5] 3.2 - 3.44: 18
+[6] 3.44 - 3.68: 8
+[7] 3.68 - 3.92: 11
+[8] 3.92 - 4.16: 2
+[9] 4.16 - 4.4: 2
+HISTOGRAM (5 bins):   Sepal Width (Cm)
+[0] 2 - 2.48: 11
+[1] 2.48 - 2.96: 45
+[2] 2.96 - 3.44: 67
+[3] 3.44 - 3.92: 19
+[4] 3.92 - 4.4: 4
+The following table should not have the column SepalWidthCm
+--------------------------------- Dataset Head ---------------------------------
+Id              SepalLengthCm   PetalLengthCm   PetalWidthCm    Species         
+2               4.9             1.4             0.2             Iris-setosa     
+5               5               1.4             0.2             Iris-setosa     
+6               5.4             1.7             0.4             Iris-setosa     
+7               4.6             1.4             0.3             Iris-setosa     
+8               5               1.5             0.2             Iris-setosa     
+--------------------------------------------------------------------------------

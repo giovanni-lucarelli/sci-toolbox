@@ -115,6 +115,7 @@ std::vector<std::string> DataFrame::get_string_column(const std::string& name) c
 
 void DataFrame::table_nan()
 {
+    unsigned int spacing{formatting_width() +3};
     for (auto &&name : column_names)
     {
         unsigned int cnt{0};
@@ -125,7 +126,7 @@ void DataFrame::table_nan()
                 cnt++;
             }   
         }
-        std::cout << name << "\t" << cnt << "\n";
+        std::cout << std::setw(spacing) << std::left << name << std::setw(spacing) << std::left << cnt << std::endl;
     }
 }
 
@@ -142,10 +143,13 @@ void DataFrame::drop_row_nan()
     std::vector<unsigned int> rows_to_drop;
 
     // Identify rows with any `std::nullopt`
+    int cnt{0};
     for (const auto& column : data) {
         for (std::size_t i = 0; i < num_rows; ++i) {
             if (!column[i].has_value()) {
-                rows_to_drop.push_back(i);
+                rows_to_drop.push_back(i-cnt);
+                std::cout << "droppare" << i - cnt<<"\n";
+                cnt=1; // serve perchè quando poi droppo una riga gli indici saranno shiftati di 1
             }
         }
     }
@@ -156,7 +160,7 @@ void DataFrame::drop_row_nan()
     }
 }
 
-double DataFrame::mean(const std::string& name) {
+double DataFrame::mean(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -168,7 +172,7 @@ double DataFrame::mean(const std::string& name) {
     return gsl_stats_mean(values.data(), 1, values.size());
 }
 
-double DataFrame::median(const std::string& name) {
+double DataFrame::median(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -180,7 +184,7 @@ double DataFrame::median(const std::string& name) {
     return gsl_stats_median(values.data(), 1, values.size());
 }
 
-double DataFrame::min(const std::string& name) {
+double DataFrame::min(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -192,7 +196,7 @@ double DataFrame::min(const std::string& name) {
     return gsl_stats_min(values.data(), 1, values.size());
 }
 
-double DataFrame::max(const std::string& name) {
+double DataFrame::max(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -204,7 +208,7 @@ double DataFrame::max(const std::string& name) {
     return gsl_stats_max(values.data(), 1, values.size());
 }
 
-double DataFrame::quantile(const std::string& name, const double& q) {
+double DataFrame::quantile(const std::string& name, const double& q) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -218,7 +222,7 @@ double DataFrame::quantile(const std::string& name, const double& q) {
     //return gsl_stats_max(values.data(), 1, values.size());
 }
 
-double DataFrame::var(const std::string& name) {
+double DataFrame::var(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -230,7 +234,7 @@ double DataFrame::var(const std::string& name) {
     return gsl_stats_variance(values.data(), 1, values.size());
 }
 
-double DataFrame::sd(const std::string& name) {
+double DataFrame::sd(const std::string& name) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values= get_double_column(name);
@@ -242,24 +246,24 @@ double DataFrame::sd(const std::string& name) {
     return gsl_stats_sd(values.data(), 1, values.size());
 }
 
-double DataFrame::covariance(const std::string& name1, const std::string& name2) {
+double DataFrame::covariance(const std::string& name1, const std::string& name2) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values1= get_double_column(name1);
     std::vector<double> values2= get_double_column(name2);
     // If values does not contain any numerical value, raise an error
     if (values1.empty()||values2.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("Error in function covariance(): one of the two vectors is empty");
     }
     // If sizes don't match, raise an error
     if (values1.size() != values2.size()) {
-        throw std::runtime_error("Error in computeCov(): incompatible sizes to compute covariance.");
+        throw std::runtime_error("Error in covariance(): incompatible sizes to compute covariance.");
     }
     // If everything is ok, return the covariance
     return gsl_stats_covariance(values1.data(), 1, values2.data(),1,values1.size());
 }
 
-double DataFrame::correlation(const std::string& name1, const std::string& name2) {
+double DataFrame::correlation(const std::string& name1, const std::string& name2) const {
     // If values does not contain any numerical value, raise an error
     // Convert the column into a std::vector of doubles
     std::vector<double> values1= get_double_column(name1);
@@ -276,7 +280,7 @@ double DataFrame::correlation(const std::string& name1, const std::string& name2
     return gsl_stats_correlation(values1.data(), 1, values2.data(),1,values1.size());
 }
 
-bool DataFrame::is_numeric(const std::string& name){
+bool DataFrame::is_numeric(const std::string& name) const{
     for (const auto &cell : data[find_idx(name)])
     {
         if (std::holds_alternative<std::string>(*cell))
@@ -287,7 +291,7 @@ bool DataFrame::is_numeric(const std::string& name){
     return true;
 }
 
-void DataFrame::correlation_matrix(std::vector<std::string>& names) {
+void DataFrame::correlation_matrix(std::vector<std::string>& names) const {
     // Determine the maximum length of a numeric name for formatting
     int max_name_len = 0;
     for (const auto& name : names) {
@@ -318,19 +322,19 @@ void DataFrame::correlation_matrix(std::vector<std::string>& names) {
     }
 }
 
-void DataFrame::table(const std::string& name){
+void DataFrame::table(const std::string& name) const {
     std::map<std::string,unsigned int> table{};
     for (auto& val : get_string_column(name)) {
         table[val] ++; // Update the frequency
     }
-
+    unsigned int spacing{formatting_width() +3};
     for(auto &el : table){
-        std::cout<<std::right<<std::setw(15)<<el.first << " ";
+        std::cout<<std::setw(spacing) << std::left <<el.first << " ";
     }
     std::cout << std::endl;
 
     for(auto &el : table){
-        std::cout<<std::right<<std::setw(15)<<el.second << " ";
+        std::cout<<std::setw(spacing) << std::left<<el.second << " ";
     }
     std::cout << std::endl;
 
@@ -438,18 +442,35 @@ DataFrame::row_iterator DataFrame::end() const {
     return row_iterator(*this, max_rows); 
 }
 
-void DataFrame::head(){
-    
-    // Determine the maximum length of a numeric name for formatting
+unsigned int DataFrame:: formatting_width() const
+{
+    // Determine the maximum length of name for formatting
     int max_name_len{0};
     for (const auto& name : column_names) {
         max_name_len = std::max(max_name_len, static_cast<int>(name.length()));
     }
+    return max_name_len;
+}
 
-    const int spacing{max_name_len + 2};
+void DataFrame::head() const
+{
+    // Determine the maximum length of a name for formatting
+    unsigned int spacing{formatting_width() +3};
+    
+    // Calculate the total width of the table
+    unsigned int total_width = spacing * column_names.size();
+
+    // Create the header string, centered within the total width
+    std::string header_str = " Dataset Head ";
+    int padding = (total_width - header_str.length()) / 2;
+    header_str = std::string(padding, '-') + header_str + std::string(padding, '-');
+
+    // Print the header
+    std::cout << header_str << std::endl;
+
     // Print the header row with appropriate spacing
     for (const auto& name : column_names) {
-        std::cout << std::setw(spacing) << name;
+        std::cout << std::setw(spacing) << std::left << name;
     }
     std::cout << std::endl;
     
@@ -474,8 +495,98 @@ void DataFrame::head(){
                 
         }
         std::cout << std::endl;
-    } 
+    }
+    std::cout << std::string(total_width, '-') << std::endl; 
 }
+
+void DataFrame::summary() const {
+    const unsigned int spacing{formatting_width() + 3};
+
+    // Calculate the total width of the table
+    unsigned int n_numeric_feat{};
+    for (auto &&col : column_names)
+    {   
+        if (is_numeric(col))
+        {
+            n_numeric_feat++;
+        }     
+    }
+
+    unsigned int total_width = spacing * n_numeric_feat + 10;
+
+    // Create the header string, centered within the total width
+    std::string header_str = " Dataset Summary ";
+    int padding = (total_width - header_str.length()) / 2;
+    header_str = std::string(padding, '-') + header_str + std::string(padding, '-');
+
+    // Print the header
+    std::cout << header_str << std::endl;
+
+    // Headers for each column
+    std::cout << std::setw(10) << "";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << std::left << name;
+        }
+    }
+    std::cout << std::endl;
+
+    // Print Min
+    std::cout << std::setw(10) << "Min.";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << min(name);
+        }
+    }
+    std::cout << std::endl;
+
+    // Print 1st Quartile
+    std::cout << std::setw(10) << "1st Qu.";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << quantile(name, 0.25);
+        }
+    }
+    std::cout << std::endl;
+
+    // Print Median
+    std::cout << std::setw(10) << "Median";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << median(name);
+        }
+    }
+    std::cout << std::endl;
+
+    // Print Mean
+    std::cout << std::setw(10) << "Mean";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << mean(name);
+        }
+    }
+    std::cout << std::endl;
+
+    // Print 3rd Quartile
+    std::cout << std::setw(10) << "3rd Qu.";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << quantile(name, 0.75);
+        }
+    }
+    std::cout << std::endl;
+
+    // Print Max
+    std::cout << std::setw(10) << "Max.";
+    for (const auto& name : column_names) {
+        if (is_numeric(name)) {
+            std::cout << std::setw(spacing) << max(name);
+        }
+    }
+    std::cout << std::endl;
+    std::cout << std::string(total_width, '-') << std::endl; 
+}
+
 
 void DataFrame::read_csv(const std::string& filename, char separator, bool has_header) {
     // Clear existing data
@@ -584,69 +695,6 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
         }
     }
 }
-
-/* void DataFrame::read_json(const std::string& filename)
-{
-    try
-    {
-        // Apri il file
-        std::ifstream file(filename);
-        if (!file.is_open())
-        {
-            std::cerr << "Errore nell'apertura del file: " << filename << std::endl;
-            throw std::invalid_argument("file not found");
-        }
-
-        // Leggi il contenuto del file in una stringa
-        std::string json_content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-        // Parsing del JSON
-        boost::json::value json_value = boost::json::parse(json_content);
-
-        // Estrai i nomi delle colonne
-        const auto& json_object = json_value.as_object();
-        column_names.clear();
-        for (const auto& col_name : json_object.at("columns").as_array())
-        {
-            column_names.push_back(col_name.as_string().c_str());
-        }
-
-        // Inizializza le colonne vuote
-        data.clear();
-        data.resize(column_names.size());
-
-        // Estrai i dati riga per riga
-        const auto& rows = json_object.at("data").as_array();
-        for (const auto& row : rows)
-        {
-            const auto& row_array = row.as_array();
-            for (size_t i = 0; i < row_array.size(); ++i)
-            {
-                const auto& cell = row_array[i];
-                if (cell.is_null())
-                {
-                    data[i].push_back(std::nullopt);
-                }
-                else if (cell.is_double() || cell.is_int64())
-                {
-                    data[i].push_back(cell.to_number<double>());
-                }
-                else if (cell.is_string())
-                {
-                    data[i].push_back(cell.as_string().c_str());
-                }
-                else
-                {
-                    std::cerr << "Tipo di dato non supportato nella cella" << std::endl;
-                }
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Errore durante la lettura del JSON: " << e.what() << std::endl;
-    }
-} */
 
 void DataFrame::read_json(const std::string& filename) {
     // Clear existing data
