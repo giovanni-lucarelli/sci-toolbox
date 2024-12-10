@@ -58,6 +58,7 @@ public:
 
     std::vector<std::string> get_string_column(const std::string& name) const;
 
+    // usefull to display the output in a formatted style
     unsigned int formatting_width() const;
 
     /* ---------------------------------------------------------------------- */

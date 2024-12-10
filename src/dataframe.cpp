@@ -143,20 +143,21 @@ void DataFrame::drop_row_nan()
     std::vector<unsigned int> rows_to_drop;
 
     // Identify rows with any `std::nullopt`
-    int cnt{0};
     for (const auto& column : data) {
         for (std::size_t i = 0; i < num_rows; ++i) {
             if (!column[i].has_value()) {
-                rows_to_drop.push_back(i-cnt);
-                std::cout << "droppare" << i - cnt<<"\n";
-                cnt=1; // serve perchè quando poi droppo una riga gli indici saranno shiftati di 1
+                rows_to_drop.push_back(i);
             }
         }
     }
 
+    // sort is necessary to rescale the index correctly
+    std::sort(rows_to_drop.begin(), rows_to_drop.end());
+    unsigned int cnt{0};
     for (auto &&idx : rows_to_drop)
     {
-        drop_row(idx);
+        drop_row(idx-cnt);  // everytime a row is dropped, rescale the idx
+        cnt +=1;    
     }
 }
 
@@ -293,17 +294,12 @@ bool DataFrame::is_numeric(const std::string& name) const{
 
 void DataFrame::correlation_matrix(std::vector<std::string>& names) const {
     // Determine the maximum length of a numeric name for formatting
-    int max_name_len = 0;
-    for (const auto& name : names) {
-        if (is_numeric(name)) {
-            max_name_len = std::max(max_name_len, static_cast<int>(name.length()));
-        }
-    }
+    unsigned int max_name_len{formatting_width() +3};
 
     // Print the header row with appropriate spacing
     for (const auto& name : names) {
         if (is_numeric(name)) {
-            std::cout << std::setw(max_name_len + 1) << name;
+            std::cout << std::setw(max_name_len) << std::right << name;
         }
     }
     std::cout << std::endl;
@@ -314,7 +310,7 @@ void DataFrame::correlation_matrix(std::vector<std::string>& names) const {
             for (const auto& name2 : names) {
                 if (is_numeric(name2)) {
                     // Assuming correlation() returns a double value
-                    std::cout << std::fixed << std::setprecision(4) << std::setw(max_name_len + 1) << correlation(name1, name2);
+                    std::cout << std::fixed << std::setprecision(4) << std::setw(max_name_len) << correlation(name1, name2);
                 }
             }
             std::cout << std::endl;
