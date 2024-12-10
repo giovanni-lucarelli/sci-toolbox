@@ -1,3 +1,9 @@
+
+DATASET SHAPE:
+
+N. ROWS:	150
+N. COLUMNS:	6
+
 ----------------------------------------- Dataset Head -----------------------------------------
 Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    Species         
 1               5.1             nan             1.4             0.2             Iris-setosa     
@@ -41,7 +47,7 @@ Species         0
 ... DROPPING THE ROWS CONTAINING NANS ...
 
 
-NOW THE DATASET SHOULD HANE NO NANS
+NOW THE DATASET SHOULD HAVE NO NANS
 
 ----------------------------------------- Dataset Head -----------------------------------------
 Id              SepalLengthCm   SepalWidthCm    PetalLengthCm   PetalWidthCm    Species         
@@ -64,7 +70,6 @@ Species         0
 TESTING COVAREIANCE AND CORRELATION
 
 Covariance (SepalLengthCm,SepalWidthCm):	-0.355329
-
 Correlation (SepalLengthCm,SepalWidthCm):	-0.355329
 
 CORRELATION MATRIX

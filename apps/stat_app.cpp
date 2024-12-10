@@ -45,6 +45,10 @@ int main(int argc, char* argv[])
         //iris.read_json(in_dir_name+in_file_name);
          /* ----------------------------------------------------------------- */
 
+        std::cout << "\nDATASET SHAPE:" <<"\n\n";
+        std::cout<< "N. ROWS:\t" << iris.shape().first<<"\n";
+        std::cout<< "N. COLUMNS:\t" << iris.shape().second<<"\n\n";
+
         iris.head();
     
         iris.summary();
@@ -71,14 +75,14 @@ int main(int argc, char* argv[])
         std::cout << "\n... DROPPING THE ROWS CONTAINING NANS ..." <<"\n\n";
         iris.drop_row_nan();
         // check if everything is correct
-        std::cout << "\nNOW THE DATASET SHOULD HANE NO NANS" <<"\n\n";
+        std::cout << "\nNOW THE DATASET SHOULD HAVE NO NANS" <<"\n\n";
         iris.head();
         std::cout << "\nNANS TABLE" <<"\n\n";
         iris.table_nan();
         
         // compute covariance and correlation between two numerical features
         std::cout << "\nTESTING COVAREIANCE AND CORRELATION" <<"\n\n";
-        std::cout << "Covariance (SepalLengthCm,SepalWidthCm):\t" << iris.correlation("SepalWidthCm", "PetalWidthCm")<<"\n\n";
+        std::cout << "Covariance (SepalLengthCm,SepalWidthCm):\t" << iris.correlation("SepalWidthCm", "PetalWidthCm")<<"\n";
         std::cout << "Correlation (SepalLengthCm,SepalWidthCm):\t" << iris.correlation("SepalWidthCm", "PetalWidthCm")<<"\n\n";
         
         // print the correlation matrix between all the pairs of (numerical) features

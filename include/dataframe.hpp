@@ -28,13 +28,13 @@ public:
 
     void read_json(const std::string& filename);
 
-    const std::vector<ColumnType>& get_data();
+    const std::vector<ColumnType>& get_data() const;
 
     std::pair<unsigned int,unsigned int> shape() const;
 
-    const ColumnType& get_column(const size_t column);
+    const ColumnType& get_column(const size_t column) const;
 
-    const std::vector<std::string>& get_header();
+    const std::vector<std::string>& get_header() const;
     
     void add_column(const std::string& column_name, const ColumnType& new_col);
 
@@ -48,7 +48,7 @@ public:
 
     bool is_numeric(const std::string& name) const;
 
-    void table_nan();
+    void table_nan() const;
 
     void drop_row_nan();
 

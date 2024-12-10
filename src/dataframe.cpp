@@ -17,28 +17,37 @@
 #include "dataframe.hpp"
 
 
-const std::vector<ColumnType>& DataFrame::get_data(){
+const std::vector<ColumnType>& DataFrame::get_data() const 
+{
     return data;
 }
 
 // first = nrows, second = ncols
-std::pair<unsigned int,unsigned int> DataFrame::shape() const {
+std::pair<unsigned int,unsigned int> DataFrame::shape() const 
+{
     std::pair<unsigned int,unsigned int> dims=std::make_pair(data[0].size(),data.size());
     return dims;
 }
 
-const ColumnType& DataFrame::get_column(const size_t column){
+const ColumnType& DataFrame::get_column(const size_t column) const 
+{   
+    if (column > column_names.size())
+    {
+        throw std::invalid_argument("Error in get_column: column index out of range");
+    }
+    
     return data[column];
 }
 
-const std::vector<std::string>& DataFrame::get_header(){
+const std::vector<std::string>& DataFrame::get_header() const 
+{
     return column_names;
 }
 
 void DataFrame::add_column(const std::string& column_name, const ColumnType& new_col) {
 // If data is not empty, check that the new column has the same length
     if (!data.empty() && new_col.size() != data[0].size()) {
-        throw std::invalid_argument("New column must have the same number of rows as existing data");
+        throw std::invalid_argument("Error in add_column: New column must have the same number of rows as existing data");
     }
     
     // Add the column name
@@ -49,17 +58,38 @@ void DataFrame::add_column(const std::string& column_name, const ColumnType& new
 }
 
 void DataFrame::set_header(const std::vector<std::string>& new_header){
+    if (new_header.size()>column_names.size())
+    {
+        std::cerr << "WARNING in set_header: the header has more columns than the data!" << std::endl;
+    }
+    
     column_names.clear();
     column_names = new_header;
 }
 
 void DataFrame::drop_row(const unsigned int& row)
-{
+{   
+    if (row > data[0].size())
+    {
+        throw std::invalid_argument("Error in drop_row: index out of range");
+    }
     for (auto &&col : data)
     {
         col.erase((col.begin()+row));
     }
     
+}
+
+unsigned int DataFrame::find_idx(const std::string& name) const {
+    // Find the attribute
+    auto it = std::find(column_names.begin(), column_names.end(), name);
+    if (it != column_names.end()) {
+        // Calculate the index by subtracting the beginning iterator from the found iterator
+        return std::distance(column_names.begin(), it);
+    } else {
+        std::cout << "Attribute not found\n";
+        throw std::invalid_argument("Attribute not found");
+    }
 }
 
 void DataFrame::drop_col(const std::string& name)
@@ -74,20 +104,6 @@ void DataFrame::drop_col(const std::string& name)
     data.erase(data.begin() + idx);
 }
 
-unsigned int DataFrame::find_idx(const std::string& name) const {
-    // Find the attribute
-    auto it = std::find(column_names.begin(), column_names.end(), name);
-    if (it != column_names.end()) {
-        // Calculate the index by subtracting the beginning iterator from the found iterator
-        return std::distance(column_names.begin(), it);
-    } else {
-        std::cout << "Element not found\n";
-        throw std::invalid_argument("Attribute not found");
-    }
-}
-
-// Metodo per ottenere una colonna filtrata solo con double 
-// serve per usare tutte le routine gls
 std::vector<double> DataFrame::get_double_column(const std::string& name) const{
     std::vector<double> double_values{};
     
@@ -98,6 +114,7 @@ std::vector<double> DataFrame::get_double_column(const std::string& name) const{
             double_values.push_back(std::get<double>(*cell));
         }   
     }
+    
     return double_values;
 }
 
@@ -113,7 +130,7 @@ std::vector<std::string> DataFrame::get_string_column(const std::string& name) c
     return string_values;
 }
 
-void DataFrame::table_nan()
+void DataFrame::table_nan() const
 {
     unsigned int spacing{formatting_width() +3};
     for (auto &&name : column_names)
@@ -162,120 +179,109 @@ void DataFrame::drop_row_nan()
 }
 
 double DataFrame::mean(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function mean(): vector is empty.");
     }
 
     return gsl_stats_mean(values.data(), 1, values.size());
 }
 
 double DataFrame::median(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function median(): vector is empty.");
     }
 
     return gsl_stats_median(values.data(), 1, values.size());
 }
 
 double DataFrame::min(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function min(): vector is empty.");
     }
 
     return gsl_stats_min(values.data(), 1, values.size());
 }
 
 double DataFrame::max(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function max(): vector is empty.");
     }
 
     return gsl_stats_max(values.data(), 1, values.size());
 }
 
 double DataFrame::quantile(const std::string& name, const double& q) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function quantile(): vector is empty.");
     }
     std::sort(values.begin(), values.end());
 
     return gsl_stats_quantile_from_sorted_data(values.data(), 1, values.size(), q);
-    //return gsl_stats_max(values.data(), 1, values.size());
 }
 
 double DataFrame::var(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function var(): vector is empty.");
     }
 
     return gsl_stats_variance(values.data(), 1, values.size());
 }
 
 double DataFrame::sd(const std::string& name) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values= get_double_column(name);
-    // If values does not contain any numerical value, raise an error
+
     if (values.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function sd(): vector is empty.");
     }
 
     return gsl_stats_sd(values.data(), 1, values.size());
 }
 
 double DataFrame::covariance(const std::string& name1, const std::string& name2) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values1= get_double_column(name1);
     std::vector<double> values2= get_double_column(name2);
-    // If values does not contain any numerical value, raise an error
+
     if (values1.empty()||values2.empty()) {
-        throw std::runtime_error("Error in function covariance(): one of the two vectors is empty");
+        throw std::runtime_error("ERROR in function covariance(): one of the two vectors is empty");
     }
     // If sizes don't match, raise an error
     if (values1.size() != values2.size()) {
-        throw std::runtime_error("Error in covariance(): incompatible sizes to compute covariance.");
+        throw std::runtime_error("ERROR in function covariance(): incompatible sizes to compute covariance.");
     }
     // If everything is ok, return the covariance
     return gsl_stats_covariance(values1.data(), 1, values2.data(),1,values1.size());
 }
 
 double DataFrame::correlation(const std::string& name1, const std::string& name2) const {
-    // If values does not contain any numerical value, raise an error
-    // Convert the column into a std::vector of doubles
+    // Convert the column into a std::vector of doubles in order to use the gls method
     std::vector<double> values1= get_double_column(name1);
     std::vector<double> values2= get_double_column(name2);
-    // If values does not contain any numerical value, raise an error
+
     if (values1.empty()||values2.empty()) {
-        throw std::runtime_error("Error in function mean(): vector is empty.");
+        throw std::runtime_error("ERROR in function correlation(): vector is empty.");
     }
-    // If sizes don't match, raise an error
+    // If vectors have different sizes raise an error
     if (values1.size() != values2.size()) {
-        throw std::runtime_error("Error in computeCov(): incompatible sizes to compute covariance.");
+        throw std::runtime_error("ERROR in function correlation(): incompatible sizes to compute covariance.");
     }
     // If everything is ok, return the covariance
     return gsl_stats_correlation(values1.data(), 1, values2.data(),1,values1.size());
@@ -309,7 +315,6 @@ void DataFrame::correlation_matrix(std::vector<std::string>& names) const {
         if (is_numeric(name1)) {
             for (const auto& name2 : names) {
                 if (is_numeric(name2)) {
-                    // Assuming correlation() returns a double value
                     std::cout << std::fixed << std::setprecision(4) << std::setw(max_name_len) << correlation(name1, name2);
                 }
             }
@@ -324,21 +329,21 @@ void DataFrame::table(const std::string& name) const {
         table[val] ++; // Update the frequency
     }
     unsigned int spacing{formatting_width() +3};
+    // print attributes
     for(auto &el : table){
-        std::cout<<std::setw(spacing) << std::left <<el.first << " ";
+        std::cout<<std::setw(spacing) << std::left <<el.first << " "; 
     }
     std::cout << std::endl;
-
+    // print frequency counts
     for(auto &el : table){
-        std::cout<<std::setw(spacing) << std::left<<el.second << " ";
+        std::cout<<std::setw(spacing) << std::left<<el.second << " "; 
     }
     std::cout << std::endl;
 
 }
 
-// Metodo per generare un istogramma da una colonna specifica
 void DataFrame::histogram(const std::string& name, int num_bins) const
-{
+{   
     std::vector<double> values{get_double_column(name)};
     
     if (values.empty())
@@ -354,6 +359,7 @@ void DataFrame::histogram(const std::string& name, int num_bins) const
     // Add a small epsilon to the maximum value to ensure it falls in the last bin
     double epsilon = std::numeric_limits<double>::epsilon();
     double max_value_adjusted = max_value + 10*epsilon;
+    // the value 10 has been chosen empirically
 
     // Build a histogram with an inclusive upper bound
     auto hist = boost::histogram::make_histogram(
@@ -377,7 +383,7 @@ void DataFrame::histogram(const std::string& name, int num_bins) const
 
 DataFrame::row_iterator::row_iterator(const DataFrame& df, size_t row) 
     : dataframe(df), current_row(row) {
-    // Calcola il numero massimo di righe come la dimensione della colonna più corta
+    // maximum rows number is the size of the shortest column
     max_rows = std::numeric_limits<size_t>::max();
     for (const auto& column : dataframe.data) {
         max_rows = std::min(max_rows, column.size());
@@ -386,6 +392,8 @@ DataFrame::row_iterator::row_iterator(const DataFrame& df, size_t row)
 
 DataFrame::row_iterator::value_type DataFrame::row_iterator::operator*() const {
     value_type row;
+
+    // fill the row by scanning all the columns for a fixed idex 
     for (const auto& column : dataframe.data) {
         if (current_row < column.size()) {
             row.push_back(column[current_row]);
@@ -430,7 +438,7 @@ DataFrame::row_iterator DataFrame::begin() const {
 }
 
 DataFrame::row_iterator DataFrame::end() const { 
-    // Calcola il numero massimo di righe come la dimensione della colonna più corta
+    // maximum rows number is the size of the shortest column
     size_t max_rows = std::numeric_limits<size_t>::max();
     for (const auto& column : data) {
         max_rows = std::min(max_rows, column.size());
@@ -440,7 +448,7 @@ DataFrame::row_iterator DataFrame::end() const {
 
 unsigned int DataFrame:: formatting_width() const
 {
-    // Determine the maximum length of name for formatting
+    // Determine the maximum length of name for formatting the output
     int max_name_len{0};
     for (const auto& name : column_names) {
         max_name_len = std::max(max_name_len, static_cast<int>(name.length()));
@@ -461,15 +469,15 @@ void DataFrame::head() const
     int padding = (total_width - header_str.length()) / 2;
     header_str = std::string(padding, '-') + header_str + std::string(padding, '-');
 
-    // Print the header
     std::cout << header_str << std::endl;
 
-    // Print the header row with appropriate spacing
+    // Print the header 
     for (const auto& name : column_names) {
         std::cout << std::setw(spacing) << std::left << name;
     }
     std::cout << std::endl;
     
+    // Print the data in a formatted style by looking at all the cases (option/variant)
     for (auto rowIt = this->begin(); rowIt < std::min(this->begin()+5, this->end()); rowIt++)  
     {   
         for (const auto& el : *rowIt) {
@@ -515,7 +523,6 @@ void DataFrame::summary() const {
     int padding = (total_width - header_str.length()) / 2;
     header_str = std::string(padding, '-') + header_str + std::string(padding, '-');
 
-    // Print the header
     std::cout << header_str << std::endl;
 
     // Headers for each column
@@ -584,7 +591,7 @@ void DataFrame::summary() const {
 }
 
 
-void DataFrame::read_csv(const std::string& filename, char separator, bool has_header) {
+void DataFrame::read_csv(const std::string& filename, char separator, bool has_header){
     // Clear existing data
     column_names.clear();
     data.clear();
@@ -597,7 +604,7 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
 
     std::string line;
         
-    // Read header if specified
+    // Read header if true
     if (has_header) {
         if (!std::getline(file, line)) {
             throw std::runtime_error("Empty CSV file");
@@ -613,40 +620,26 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
     }
 
     // Read all rows and store in raw_data
+    // raw_data is the transposed version of the row
 
     std::vector<ColumnType> raw_data;
     while (std::getline(file, line)) {
         std::istringstream row_stream(line);
         std::string cell;
         ColumnType row_cells;
-        /* std::vector<std::string> row_cells; */
-
-        // Parse each cell in the row
-        /* while (std::getline(row_stream, cell, separator)) {
-            // Trim whitespace
-            cell.erase(0, cell.find_first_not_of(" \t\r\n"));
-            cell.erase(cell.find_last_not_of(" \t\r\n") + 1);
-
-            // TODO aggiungere degli if per castare come double/nullptr o string!
-            row_cells.push_back(cell);
-        } */
 
         while (std::getline(row_stream, cell, separator)) {
-            // Trim whitespace
-            /* cell.erase(0, cell.find_first_not_of(" \t\r\n"));
-            cell.erase(cell.find_last_not_of(" \t\r\n") + 1); */
-
-            // Se la cella è vuota, inserisci std::nullopt
+            // If empy cell put a null option
             if (cell.empty()) {
                 row_cells.push_back(std::nullopt);
             } 
             else 
             {
-                // Prova a convertire la cella in double
+                // try to convert the cell into a double
                 try {
                     row_cells.push_back(std::stod(cell));
                 } catch (const std::invalid_argument&) {
-                    // Se la conversione fallisce, trattala come stringa
+                    // if fails pass it as a string
                     row_cells.push_back(cell);
                 }
             }
@@ -674,17 +667,9 @@ void DataFrame::read_csv(const std::string& filename, char separator, bool has_h
         for (const auto& row : raw_data) {
             for (size_t col = 0; col < column_names.size(); ++col) {
                 if (col < row.size()) {                    
-                    /* try {
-                        if (row[col].empty()) {
-                            data[col].push_back(std::nullopt);
-                        } else {
-                            double numeric_value = std::stod(row[col]);
-                            data[col].push_back(numeric_value);
-                        }
-                    } catch (const std::invalid_argument&) { */
                     data[col].push_back(row[col]);
                 } else {
-                    // If row is shorter, push null
+                    // If row is shorter, push null option
                     data[col].push_back(std::nullopt);
                 }
             }
@@ -728,7 +713,7 @@ void DataFrame::read_json(const std::string& filename) {
         column_names.push_back(std::string(key));
     }
 
-    // Prepare columns
+    // Prepare columns with the correct size
     data.resize(column_names.size());
 
     // Populate data
