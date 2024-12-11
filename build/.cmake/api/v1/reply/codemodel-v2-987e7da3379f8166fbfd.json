@@ -1,0 +1,119 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "src",
+					"jsonFile" : "directory-src-Debug-b6cf2213fc5053b67c22.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0,
+						2
+					]
+				},
+				{
+					"build" : "apps",
+					"jsonFile" : "directory-apps-Debug-76fddd1453400e648719.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "apps",
+					"targetIndexes" : 
+					[
+						1,
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "SciToolbox",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "dataframe::@145eef247bfb46b6828c",
+					"jsonFile" : "target-dataframe-Debug-d73cc3977038489f774d.json",
+					"name" : "dataframe",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "interpol_app::@9e189ee61a034fc9b705",
+					"jsonFile" : "target-interpol_app-Debug-a42f04f4e1d93e645918.json",
+					"name" : "interpol_app",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "interpolation::@145eef247bfb46b6828c",
+					"jsonFile" : "target-interpolation-Debug-b684e3d3ec72cff0bbcd.json",
+					"name" : "interpolation",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "stat_app::@9e189ee61a034fc9b705",
+					"jsonFile" : "target-stat_app-Debug-e75b92f619930debce2c.json",
+					"name" : "stat_app",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/giovanni/Desktop/sci-toolbox-final/build",
+		"source" : "/home/giovanni/Desktop/sci-toolbox-final"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
