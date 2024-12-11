@@ -1,21 +1,23 @@
-# Authors 
-**Elena Ruiz de la Cuesta**: elenaruizdelacuestacastano@gmail.com
-
-**Giovanni Lucarelli**: 
-giovanni.lucarelli@studenti.units.it
-
 # sci-toolbox
-This is the project for the second homework assignment of the course Advanced Programming @ University of Trieste. It implements a scientific toolbox consisting of two modules:
-- Statistics module (A);
-- Interpolation module (B).
+This project is the second homework assignment for the *Advanced Programming* course at the University of Trieste. It implements a scientific toolbox with two main modules:
 
+- **Statistics Module**  
+- **Interpolation Module**  
+
+Additionally, it includes two corresponding applications to test these modules.
 ## Table of contents
 
-1. [Project structure](#project-structure)
-2. [How to build](#how-to-build)
-3. [Module A: Statistics](#module-a-statistics-module)
-4. [Module B: Interpolation](#module-d-ode-module)
-5. [Workload division and references](#workload-division-and-external-references)
+- [sci-toolbox](#sci-toolbox)
+  - [Table of contents](#table-of-contents)
+  - [Project structure](#project-structure)
+  - [How to build](#how-to-build)
+    - [Installing third part libraries](#installing-third-part-libraries)
+    - [Building `sci-toolbox`](#building-sci-toolbox)
+      - [Custom Builds](#custom-builds)
+    - [Running the apps](#running-the-apps)
+  - [Module A: Statistics](#module-a-statistics)
+  - [Module B: Interpolation](#module-b-interpolation)
+  - [Authors and contributions](#authors-and-contributions)
 
 ## Project structure
 
@@ -23,17 +25,30 @@ This is the project for the second homework assignment of the course Advanced Pr
 📂 project/
 │ 
 ├── 📂 apps/
+│   ├── 📝 CMakeLists.txt
+│   ├── 📄 interopol_app.cpp
 │   └── 📄 stats_app.cpp
 │ 
 ├── 📂 datasets/
-│   └── 📊 iris.csv
+│   ├── 📊 iris.csv
+│   └── 📊 iris.json
 │
 ├── 📂 include/	
+│   ├── 📄 CardinalCubicSpline.hpp
+│   ├── 📄 GslPolynomialInterpolator.hpp
+│   ├── 📄 Interpolator.hpp
+│   ├── 📄 LinearInterpolator.hpp
+│   ├── 📄 NewtonInterpolator.hpp
 │   └── 📄 dataframe.hpp
 │ 
 ├── 📂 output/
 │
 ├── 📂 src/
+│   ├── 📄 CardinalCubicSpline.cpp
+│   ├── 📄 GslPolynomialInterpolator.cpp
+│   ├── 📄 Interpolator.cpp
+│   ├── 📄 LinearInterpolator.cpp
+│   ├── 📄 NewtonInterpolator.cpp
 │   ├── 📝 CMakeLists.txt
 │   └── 📄 dataframe.cpp
 │
@@ -43,40 +58,83 @@ This is the project for the second homework assignment of the course Advanced Pr
 ```
 ## How to build
 
-The Statistics module implements functions from *GSL-GNU Scientific Library*, so its necessary to install it before building the toolbox.
+### Installing third part libraries
 
-The build process is based on CMake and the CMake files are providede. From the root folder of the project:
+The two modules uses functions from *GSL-GNU Scientific Library* and *BOOST library*, so its necessary to install both libraries before building the toolbox.
 
-Create a folder `build/` and move inside it:
+You can install the third part library from the terminal writing
+
 ```bash
-mkdir build && cd build
+sudo apt-get install libboost-all-dev
 ```
+for BOOST and
 
-Run
 ```bash
-cmake ..
+sudo apt-get install libgsl-dev
 ```
-and then compile the program with
+for GSL.
+
+Here's a clearer and more concise version of the instructions:
+
+---
+
+### Building `sci-toolbox`
+
+`sci-toolbox` uses CMake for its build process. To build both the shared libraries and the associated applications, run the following commands from the project's root directory:
+
 ```bash
-make
-```
-
-**How to use the two modules separately?**
-
-When configuring the project using cmake, you can pass the BUILD_STAT_APP option from the terminal.
-
-To build stat_app (default behavior):
-
-```bash
-cmake -B build -DBUILD_LIB1=ON -DBUILD_LIB2=OFF
+cmake -B build
 cmake --build build
+```
 
+#### Custom Builds
+
+To build only one of the two libraries and its associated applications, specify the desired options with `ON` or `OFF`. For example, to build the `dataframe` library and exclude the `interpol` library, use:
+
+```bash
+cmake -B build -DBUILD_LIB_DATAFRAME=ON -DBUILD_LIB_INTERPOL=OFF
+cmake --build build
+```
+
+Adjust `ON` and `OFF` based on your requirements.
+
+### Running the apps
+After completing the build process, the applications will be available as executables in the `/build/apps` directory, named `stat_app` and `interpol_app`. To run them, simply type the following in the terminal:
+
+```bash
+./build/apps/stat_app iris.csv iris_analysis.txt 
+./build/apps/interpol_app
+```
+For the `stat_app` you need to provide other two inputs to the terminal: the dataset name (with its extension) and the output filename (.txt). The dataset must be stored in the `datasets` folder and the output files will be saved in the `output` folder. Eventually this can be modified from the `stat_app.cpp` source file.
 
 ## Module A: Statistics
+The `DataFrame` class serves as the core of the statistics module, offering a comprehensive framework for data storage, manipulation, and analysis. It includes functionalities for reading from file (CSV, JSON), handling tabular data and performing basic statistical operations.
 
-### DataFrame class
-- choice motivation
-- general structure 
-- row iterator
+The class stores its data in a **column-oriented** structure, which means the data is maintained as a **vector of column vectors**. This design choice has several implications for performance and flexibility, particularly for operations involving entire columns or statistical calculations.
 
-### How to run stats_app.cpp
+Each element in the DataFrame can either be a `double` or a `std::string`, this is achieved using the C++ `std::variant` type. Each column is represented as a vector of `std::optional<DataType>`. The use of `std::optional` allows individual elements to be `null` or missing ( i.e. `std::nullopt`).
+
+The class provides methods for reading data from both CSV and JSON files. For details on these methods, as well as the available statistical functions, refer to the corresponding `.hpp` and `.cpp` files.
+
+Finally, the class also provides an iterator that allows for easy row-by-row traversal of the DataFrame, for example a range-based loop looks like:
+
+```cpp
+for (const auto& row : df) {
+    // Each `row` is a vector of std::optional<DataType> representing a dataframe's row.
+}
+```
+
+
+## Module B: Interpolation
+
+## Authors and contributions
+
+**Elena Ruiz de la Cuesta**: 
+elenaruizdelacuestacastano@gmail.com
+
+Interpolation module and documentation
+
+**Giovanni Lucarelli**: 
+giovanni.lucarelli@studenti.units.it
+
+Statistics module and documentation.
