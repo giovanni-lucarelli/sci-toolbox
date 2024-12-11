@@ -1,0 +1,20 @@
+# Ignorare i file binari compilati
+*.o
+*.out
+*.exe
+
+# Ignorare i file di log
+*.log
+
+# Ignora il file TODO.md
+TODO.md
+
+# Ignorare le cartelle di build
+/build/
+/bin/
+
+# Ignorare file specifici generati da IDE come Visual Studio Code
+.vscode/
+
+# Ignorare i file di configurazione personali
+config.local.json

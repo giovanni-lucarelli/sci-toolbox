@@ -1,1 +1,0 @@
-/usr/bin/g++-11 -g CMakeFiles/stat_app.dir/stat_app.cpp.o -o stat_app  -Wl,-rpath,/home/giovanni/Desktop/sci-toolbox-final/build/src:/usr/local/lib ../src/libdataframe.so /usr/local/lib/libboost_json.so.1.86.0 /usr/local/lib/libboost_container.so.1.86.0 /usr/local/lib/libboost_system.so.1.86.0 /usr/lib/x86_64-linux-gnu/libgsl.so /usr/lib/x86_64-linux-gnu/libgslcblas.so 
