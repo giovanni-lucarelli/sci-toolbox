@@ -7,18 +7,19 @@
 
 class GslPolynomialInterpolator : public Interpolator {
 public:
-    // Constructor que inicializa los datos
+    // Constructor that initialises the data
     GslPolynomialInterpolator(const std::vector<double>& x, const std::vector<double>& y);
+
     // Destructor
     ~GslPolynomialInterpolator();
 
-    // Sobrecarga del operador para la interpolación
+    // Operator overload for interpolation
     double operator()(double x) const override;
 
 private:
     void computeCoefficients();
-    gsl_interp* interp = nullptr;          // Puntero al interpolador GSL
-    gsl_interp_accel* acc = nullptr;       // Puntero al acelerador GSL
+    gsl_interp* interp = nullptr;          // Pointer to gsl interpolator
+    gsl_interp_accel* acc = nullptr;       // Pointer to gsl accelerator
 };
 
 #endif // GSL_POLYNOMIAL_INTERPOLATOR_HPP

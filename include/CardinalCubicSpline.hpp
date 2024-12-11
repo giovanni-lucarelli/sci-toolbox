@@ -6,26 +6,21 @@
 
 class CardinalCubicSpline : public Interpolator {
     public:
-    // Constructor que inicializa el spline con Boost
-    // Constructor que inicializa los datos
+    // Constructor initialising the spline with Boost
     CardinalCubicSpline(const std::vector<double>& x, const std::vector<double>& y, double start, double step);
         
     // Destructor
-    ~CardinalCubicSpline() override = default; // No se especifican excepciones
+    ~CardinalCubicSpline() override = default; 
 
-    // Método para evaluar la interpolación
+    // Method for evaluating interpolation
     double operator()(double x) const override;
 
 private:
-    // Método para verificar si los pasos entre nodos son iguales
+    // Method to check if the steps between nodes are equal
     void checkSteps(const std::vector<double>& x) const;
 
-    // Método para verificar si el número de nodos es suficiente
-    //void checkMinNodes(const std::vector<double>& x) const;
-
-    boost::math::interpolators::cardinal_cubic_b_spline<double> spline; // Spline cúbico de Boost
+    boost::math::interpolators::cardinal_cubic_b_spline<double> spline; // Cubic spline using Boost
 
 };
-
 
 #endif 

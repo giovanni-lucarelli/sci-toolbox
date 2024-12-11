@@ -7,13 +7,13 @@ class Interpolator {
 public:
     virtual ~Interpolator() = default;
 
-    // Método puro para interpolar
+    // Pure method for interpolating
     virtual double operator()(double x) const = 0;
 
-    // Declaración del setter para los datos
+    // Declaration for the data
     void setData(const std::vector<double>& x, const std::vector<double>& y);
 
-    // Método para verificar si un valor x está dentro del rango de los nodos
+    // Method to check if a value x is within the range of the nodes
     void checkRange(double x) const;
 
 protected:

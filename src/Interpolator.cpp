@@ -1,7 +1,7 @@
 #include "Interpolator.hpp"
 #include <stdexcept>
 
-// Definición del método setData and issues that we can experiment
+// Definition of the setData method and issues that we can experience
 void Interpolator::setData(const std::vector<double>& x, const std::vector<double>& y) {
     if (x.size() != y.size() || x.empty()) {
         throw std::invalid_argument("Vectors x and y must have the same non-zero size.");
