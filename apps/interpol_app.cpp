@@ -27,7 +27,7 @@ void generate_nodes_and_values(double a, double b, int n, std::vector<double>& x
     }
 }
 
-// Función para medir el tiempo de ejecución
+// Función para medir el tiempo de ejecución kjgkhlh
 double measure_execution_time(std::function<void()> f) {
     // Obtener el tiempo antes de la ejecución del código
     auto start = std::chrono::high_resolution_clock::now();
