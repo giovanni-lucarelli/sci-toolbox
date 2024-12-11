@@ -1,21 +1,17 @@
 #include "LinearInterpolator.hpp"
 
-// Constructor: inicializa los datos usando setData
+// Constructor: initialises the data using setData
 LinearInterpolator::LinearInterpolator(const std::vector<double>& x, const std::vector<double>& y) {
-    setData(x, y); // Verifica y almacena los datos
+    setData(x, y); // Verify and store data
 }
 
 double LinearInterpolator::operator()(double x) const {
-    // Verifica si x está dentro del rango de interpolación
-    // if (x < x_nodes.front() || x > x_nodes.back()) {
-    //      throw std::out_of_range("x is outside the interpolation range.");
-    // }
     checkRange(x);
 
-    // Busca el intervalo [x_nodes[i], x_nodes[i+1]] donde se encuentra x
+    // Finds the interval [x_nodes[i], x_nodes[i+1]] where x is located
     for (size_t i = 0; i < x_nodes.size() - 1; ++i) {
         if (x >= x_nodes[i] && x <= x_nodes[i + 1]) {
-            // Calcula la pendiente y devuelve el valor interpolado
+            // Calculates the slope and returns the interpolated value
             double slope = (y_nodes[i + 1] - y_nodes[i]) / (x_nodes[i + 1] - x_nodes[i]);
             return y_nodes[i] + slope * (x - x_nodes[i]); // y = y_i + slope * (x - x_i)
         }

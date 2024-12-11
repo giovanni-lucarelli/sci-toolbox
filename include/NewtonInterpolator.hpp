@@ -5,17 +5,17 @@
 
 class NewtonInterpolator : public Interpolator {
 public:
-    // Constructor que inicializa los datos y calcula los coeficientes de Newton
+    // Constructor that initialises the data and calculates the Newton coefficients
     NewtonInterpolator(const std::vector<double>& x, const std::vector<double>& y);
 
-    // Sobrecarga del operador para realizar la interpolación en el valor 'x'
+    // Operator overload to perform interpolation on the value ‘x’
     double operator()(double x) const override;
 
 private:
-    // Método para calcular los coeficientes de Newton
+    // Method for calculating Newton's coefficients
     void computeCoefficients();
 
-    std::vector<double> coefficients; // Almacena los coeficientes de Newton
+    std::vector<double> coefficients; // Stores Newton's coefficients
     
 };
 
