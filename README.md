@@ -102,9 +102,10 @@ Adjust `ON` and `OFF` based on your requirements.
 After completing the build process, the applications will be available as executables in the `/build/apps` directory, named `stat_app` and `interpol_app`. To run them, simply type the following in the terminal:
 
 ```bash
-./build/apps/stat_app
+./build/apps/stat_app iris.csv iris_analysis.txt 
 ./build/apps/interpol_app
 ```
+For the `stat_app` you need to provide other two inputs to the terminal: the dataset name (with its extension) and the output filename (.txt). The dataset must be stored in the `datasets` folder and the output files will be saved in the `output` folder. Eventually this can be modified from the `stat_app.cpp` source file.
 
 ## Module A: Statistics
 The `DataFrame` class serves as the core of the statistics module, offering a comprehensive framework for data storage, manipulation, and analysis. It includes functionalities for reading from file (CSV, JSON), handling tabular data and performing basic statistical operations.
