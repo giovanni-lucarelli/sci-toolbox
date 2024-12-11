@@ -14,7 +14,7 @@
 #include <boost/histogram.hpp>
 #include <boost/json.hpp>
 #include <map> 
-#include "dataframe.hpp"
+#include "DataFrame.hpp"
 
 
 const std::vector<ColumnType>& DataFrame::get_data() const 
