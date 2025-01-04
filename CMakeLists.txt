@@ -30,3 +30,6 @@ option(BUILD_LIB_INTERPOLATION "Build the Interpolation library and its app" ON)
 
 add_subdirectory(src)
 add_subdirectory(apps)
+
+# Create output directory
+file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/output)
