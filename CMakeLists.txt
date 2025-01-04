@@ -22,11 +22,11 @@ else()
     message(FATAL_ERROR "Boost not found")
 endif()
 
+# Options to select which libraries and apps to build
+option(BUILD_LIB_DATAFRAME "Build the Datafame library and its app" ON)
+option(BUILD_LIB_INTERPOLATION "Build the Interpolation library and its app" ON)
+
 # Add the src and apps directories
 
 add_subdirectory(src)
 add_subdirectory(apps)
-
-# Options to select which libraries and apps to build
-option(BUILD_LIB_DATAFRAME "Build the Datafame library and its app" ON)
-option(BUILD_LIB_INTERPOLATION "Build the Interpolation library and its app" ON)
